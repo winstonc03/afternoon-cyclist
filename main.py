@@ -15,7 +15,16 @@ This bike is special.
 
 ONE GOAL: Don't give the bike back lol
 
-Reach the end before the dude catches you."""
+Reach the end before the dude catches you.
+"""
+
+CHOICES = """
+    ----
+    Q. QUIT
+    ----
+"""
+
+
 
 def main():
     pass
@@ -24,10 +33,22 @@ def main():
     type_slow(INTRODUCTION)
     time.sleep(1)
 
+    # Variables
+    done = False
+
+
     # Main Loop
+    while not done:
         # TODO: Check if reached END GAME
 
         # TODO: Present the User their choices
+        print(CHOICES)
+
+        user_choice = input("What's the move?\n").lower().strip("!,.? ")
+
+        if user_choice == "q":
+            print("Thanks for Playing")
+            done = True
 
         # TODO: Change the environment based on user choice and RNG
         # TODO: Random event Generator
