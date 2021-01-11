@@ -23,12 +23,13 @@ CHOICES = """
     B. Light Jog
     C. Full Sprint
     D. Sit down on a bench
-    E. Status Check
+    E. Attempt to ride bike
+    F. Status Check
     Q. QUIT
     ----
 """
 
-WIN_MESSAGE = """
+WIN_DISTANCE = """
 The dude gives up. You copped a bike >:)
 
 You continue the run back home, leaning the bike against the wall,
@@ -37,13 +38,66 @@ Knowing you'll never ride the bike anyways.
 
 """
 
-HUNGER_MESSAGE = """
-You're too hungry to move forward, and collapse on the ground.
+WIN_RIDE = """
+Magically, you begin to pedal!
 
-The dude catches up
+The dude doesn't stand a chance as you cruise up to 30 km/h
 
+With a light breeze blowing past your face, and the sun shining brighter than ever,
+
+You pedal back home with a cheerful grin on your face, satisfied with your achievement.
 
 """
+
+LOSE_HUNGER = """
+You're too hungry to move forward, and collapse on the ground.
+
+The last thing you see before passing out is the dude taking the bike back,
+
+pedalling farther and farther away...
+
+"""
+
+LOSE_TRIP = """
+You trip on a pebble and twist your ankle.
+
+Unable to move forward, the dude catches up.
+
+You painfully watch your dream fade away slowly
+
+as he pedals away with the bike.
+
+"""
+
+LOSE_DISTANCE = """
+You feel a hand on your back, pulling your shirt
+
+Desperately, you try to free yourself, but with no success.
+
+The bike falls from your hands, and with a defeated face
+
+you watch him steal your dream away from you.
+
+"""
+
+LOSE_ENERGY = """
+Your shoulders and legs can't take it anymore, and you drop the bike.
+
+You know you've reached your limit, and collapse on the ground.
+
+After what seems like mere seconds, you open your eyes and realize your in bed.
+
+Was it all a dream?
+
+"""
+
+
+# CONSTANTS
+MAX_ENERGY = 50
+MAX_RICE = 3
+DISTANCE_WIN = 100
+STARVATION = 40
+
 
 def main():
     pass
@@ -52,27 +106,22 @@ def main():
     type_slow(INTRODUCTION)
     time.sleep(1)
 
-    # CONSTANTS
-
-    MAX_ENERGY = 50
-    MAX_RICE = 3
-    WIN_DISTANCE = 100
-    STARVATION = 100
-
     # Variables
     done = False
     travelled = 0  # 100 km is the goal
-    dude_distance = -20  # Game ends once they catch up
+    dude_distance = -25  # Game ends once they catch up
     turns = 0
     rice = MAX_RICE  # Max is 3
     energy = MAX_ENERGY  # Max is 50
     hunger = 0
 
-
-
-
     # Main Loop
     while not done:
+        # Display hunger
+        if hunger > (STARVATION - 15):
+            print("~~~~~~~~Your stomach rumbles, you need to eat something soon...~~~~~~~~")
+        elif hunger > (STARVATION - 30):
+            print("~~~~~~~~Your hunger is small, but manageable.~~~~~~~~")
         print(CHOICES)
         user_choice = input("What's the move?\n").lower().strip("!,.? ")
 
@@ -80,7 +129,7 @@ def main():
             if rice > 0:
                 rice -= 1
                 hunger = 0
-                print("\n--------yum--------")
+                print("\n--------yum :)--------")
                 print("--------Your hunger is satisfied--------\n")
             else:
                 print("\n--------You don't have any rice :(--------")
@@ -112,6 +161,15 @@ def main():
             print("--------You hoist your bike back above your head and continue running.--------\n")
 
         elif user_choice == "e":
+            if random.random() < 0.01:
+                type_slow(WIN_RIDE)
+            else:
+                print("--------You try to ride the bike, with no success.--------")
+                print("--------The dude seems to be closing the gap...--------")
+                energy -= random.randrange(2, 7)
+                dude_distance += random.randrange(7, 14)
+
+        elif user_choice == "f":
             print(f"\t---Status Check---")
             print(f"\tDistance from dude: {abs(dude_distance)}km")
             print(f"\tkm travelled: {travelled}")
@@ -124,19 +182,31 @@ def main():
             print("Thanks for Playing")
             done = True
 
-        if user_choice not in ["a","e"]:
-            hunger += random.randrange(5, 12)
+        if user_choice not in ["a", "f"]:
+            if user_choice in ["b", "c", "e"]:
+                hunger += random.randrange(7, 18)
+                turns += 1
+            else:
+                print("Please pick a valid choice.")
 
         if hunger >= STARVATION:
-            type_slow(HUNGER_MESSAGE)
+            type_slow(LOSE_HUNGER)
             done = True
 
-        if travelled >= WIN_DISTANCE:
-            type_slow(WIN_MESSAGE)
+        elif travelled >= DISTANCE_WIN:
+            type_slow(WIN_DISTANCE)
             done = True
 
-        if random.random() < 0.02:
-            print("You tripped and twisted your ankle")
+        elif dude_distance >= 0:
+            type_slow(LOSE_DISTANCE)
+            done = True
+
+        elif random.random() < 0.01:
+            type_slow(LOSE_TRIP)
+            done = True
+
+        elif energy <= 0:
+            type_slow(LOSE_ENERGY)
             done = True
 
         if rice < MAX_RICE and random.random() < 0.05:
@@ -146,6 +216,7 @@ def main():
         time.sleep(1.5)
         # TODO: Change the environment based on user choice and RNG
         # TODO: Random event Generator
+    print(f"******** You used {turns} turns. ********")
 
 
 def type_slow(slow_string):
@@ -157,5 +228,4 @@ def type_slow(slow_string):
 
 if __name__ == "__main__":
     main()
-
 
